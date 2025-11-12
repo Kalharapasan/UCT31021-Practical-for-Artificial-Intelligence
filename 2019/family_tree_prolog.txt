@@ -1,0 +1,87 @@
+% Family Tree Knowledge Base
+% Facts about family members
+
+% Gender facts
+male(roshi).
+male(donald).
+male(john).
+male(harry).
+male(william).
+male(peter).
+
+female(regan).
+female(aniya).
+female(meera).
+female(andriya).
+
+% Parent relationships
+parent_of(regan, john).
+parent_of(roshi, john).
+parent_of(regan, meera).
+parent_of(roshi, meera).
+parent_of(regan, andriya).
+parent_of(roshi, andriya).
+
+parent_of(donald, peter).
+parent_of(aniya, peter).
+
+parent_of(john, harry).
+parent_of(meera, harry).
+parent_of(andriya, william).
+parent_of(peter, william).
+
+% Rules for family relationships
+
+% Father and Mother rules
+father_of(Father, Child) :- 
+    male(Father), 
+    parent_of(Father, Child).
+
+mother_of(Mother, Child) :- 
+    female(Mother), 
+    parent_of(Mother, Child).
+
+% Grandfather and Grandmother rules
+grandfather_of(Grandfather, Child) :- 
+    male(Grandfather), 
+    parent_of(Grandfather, Parent), 
+    parent_of(Parent, Child).
+
+grandmother_of(Grandmother, Child) :- 
+    female(Grandmother), 
+    parent_of(Grandmother, Parent), 
+    parent_of(Parent, Child).
+
+% Sister rule
+sister_of(Sister, Person) :- 
+    female(Sister), 
+    parent_of(Parent, Sister), 
+    parent_of(Parent, Person), 
+    Sister \= Person.
+
+% Aunt and Uncle rules
+aunt_of(Aunt, Person) :- 
+    female(Aunt), 
+    parent_of(Parent, Person), 
+    sister_of(Aunt, Parent).
+
+uncle_of(Uncle, Person) :- 
+    male(Uncle), 
+    parent_of(Parent, Person), 
+    parent_of(Grandparent, Uncle), 
+    parent_of(Grandparent, Parent), 
+    Uncle \= Parent.
+
+% Additional helper rules for testing
+child_of(Child, Parent) :- parent_of(Parent, Child).
+son_of(Son, Parent) :- male(Son), parent_of(Parent, Son).
+daughter_of(Daughter, Parent) :- female(Daughter), parent_of(Parent, Daughter).
+
+% Example queries to test:
+% ?- father_of(roshi, john).
+% ?- mother_of(regan, meera).
+% ?- grandfather_of(roshi, harry).
+% ?- grandmother_of(regan, william).
+% ?- sister_of(meera, andriya).
+% ?- aunt_of(meera, william).
+% ?- uncle_of(peter, harry).

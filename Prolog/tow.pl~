@@ -1,0 +1,8 @@
+/*John is fat */
+fat(jone).
+
+/*Dog is brown */
+
+color(dog,brown).
+friend(julian,bob).
+

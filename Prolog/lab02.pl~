@@ -1,0 +1,106 @@
+%Task 01
+%Q03
+
+bmi(Weight,Height,BMI):-
+    BMI is Weight/(Height**2).
+
+
+%Q04
+calculate_bmi:-
+    write('Énter weight(Kg): '),
+    read(Weight),
+    write('Enter you height(m): '),
+    read(Height),
+    BMI is Weight/(Height**2),
+    format('You BMI Is: ~2f~n',[BMI]).
+
+%Task 03
+%Q01
+sum(X,Y,Result):-
+    Result is X+Y.
+
+%Q02
+multiply_integers:-
+    write('Enter first integer: '),
+    read(X),
+    integer(X),
+    write('Enter second integer :'),
+    read(Y),
+    integer(Y),
+    Product is X*Y,
+    format('Product : ~d',[Product]).
+
+%Q03
+%Interactive Calculator
+calculate:-
+    write('Enter first number: '),
+    read(X),
+    number(X),
+    write('Enter second number: '),
+    read(Y),
+    number(Y),
+    write('Enter operation (add,subtract,multiply,divide: '),
+    read(Op),
+    perform_operation(X,Y,Op,Result),
+    format('Result : ~w',[Result]).
+
+%Definr Operations
+perform_operation(X,Y,add,Result):-
+    Result is X+Y.
+perform_operation(X,Y,subtract,Result):-
+    Result is X-Y.
+perform_operation(X,Y,multiply,Result):-
+    Result is X*Y.
+perform_operation(X,Y,divide,Result):-
+    Result is X/Y.
+
+
+%Task 05
+%Q01
+
+age_category(Age,child):-
+    Age<18.
+age_category(Age,adult):-
+    Age>=18.
+
+%Q02
+check_age_category:-
+    write('Enter You Age: '),
+    read(Age),
+    age_category(Age,Category),
+    format('You age a ~w.',[Category]).
+
+%Practice Question
+%Q01
+%A
+%Monrhs with 31 days
+days_in_month(january,31).
+days_in_month(march,31).
+days_in_month(may,31).
+days_in_month(july,31).
+days_in_month(august,31).
+days_in_month(october,31).
+days_in_month(december,31).
+
+%feburuary has 28 days
+days_in_month(february,28).
+
+%Moths with 30 days(remaining)
+days_in_month(april,30).
+days_in_month(june,30).
+days_in_month(september,30).
+days_in_month(november,30).
+
+%B
+%Rule to interacively prompt the user
+
+show_days:-
+    write('Enter a month (e.g.,january): '),
+    read(Month),
+    (   days_in_month(Month,Days) ->
+    format('~w has ~d Days ~n',[Month,Days]);
+    format('Invalid month .~n')).
+
+
+
+%Q02

@@ -1,0 +1,80 @@
+% Task 01:
+
+employee('Emp201', 'Nimal',    29, 'Accountant',        55000, 68, 164).
+employee('Emp202', 'Sharanya', 34, 'Software Engineer',145000, 62, 109).
+employee('Emp203', 'Zaki',     30, 'System Analyst',   110000, 58, 172).
+employee('Emp204', 'Ruwan',    41, 'Network Engineer', 165000, 66, 155).
+employee('Emp205', 'Pawthra',  36, 'HRM',               82000, 47, 150).
+employee('Emp206', 'Theeplka', 32, 'IT Technician',     72000, 44, 151).
+employee('Emp207', 'Dunsha',   24, 'Web Developer',     88000, 36, 157).
+employee('Emp208', 'Naveen',   26, 'Data Scientist',    98000, 80, 178).
+employee('Emp209', 'Hajara',   22, 'IT Director',       75000, 41, 153).
+employee('Emp210', 'Ishandit', 44, 'QA Tester',         83000, 52, 161).
+
+% Task 02:
+
+is_employee(Name) :-
+    employee(_, Name, _, _, _, _, _).
+
+% Task 03:
+
+total_employees(Count) :-
+    findall(Emp, employee(Emp, _, _, _, _, _, _), EmpList),
+    length(EmpList, Count).
+
+% Task 04:
+
+list_employees :-
+    employee(_, Name, _, _, _, _, _),
+    writeln(Name),
+    fail.
+list_employees.
+
+% Task 05:
+
+average_salary(Avg) :-
+    findall(Salary, employee(_, _, _, _, Salary, _, _), Salaries),
+    sum_list(Salaries, Total),
+    length(Salaries, Count),
+    Count > 0,
+    Avg is Total / Count.
+
+% Task 06:
+
+promotion_status(EmpID, Status) :-
+    employee(EmpID, Name, _, _, Salary, _, _),
+    (Salary >= 80000
+        -> format(atom(Status), '~w gets promotion', [Name])
+        ;  format(atom(Status), '~w cannot get promotion', [Name])).
+
+% Task 07:
+
+employees_by_designation(Designation) :-
+    employee(_, Name, _, Designation, _, _, _),
+    format('~w is a ~w.~n', [Name, Designation]),
+    fail.
+employees_by_designation(_).
+
+
+% Task 08:
+
+employee_info('Ruwan', EmpID, Salary) :-
+    employee(EmpID, 'Ruwan', _, _, Salary, _, _).
+
+% Task 09:
+
+bmi(Name, BMI) :-
+    employee(_, Name, _, _, _, Weight, HeightCM),
+    HeightM is HeightCM / 100,
+    BMI is Weight / (HeightM * HeightM).
+
+% Task 10:
+
+can_donate_blood(Name, 'Can donate the blood') :-
+    employee(_, Name, Age, _, _, Weight, _),
+    Age >= 18,
+    Weight >= 50.
+
+can_donate_blood(Name, 'Can’t donate the blood') :-
+    employee(_, Name, Age, _, _, Weight, _),
+    (Age < 18 ; Weight < 50).

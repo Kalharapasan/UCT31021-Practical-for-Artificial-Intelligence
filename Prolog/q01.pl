@@ -1,0 +1,27 @@
+%Q01_01
+countryList(['Sri Lanka','Turkey','India','Singapore','Maldives','Pakistan']).
+print_contry_list:-
+    countryList(List),
+    write('Contry List: '),
+    writeln(List).
+%Q01_02
+
+sorted_country_list(Sorted) :-
+    countryList(List),
+    sort(List, Sorted).
+
+%Q01_03
+is_country(Country) :-
+    countryList(List),
+    member(Country, List).
+
+%Q01_04
+
+add_japan(NewList) :-
+    countryList(List),
+    NewList = ['Japan' | List].
+
+%Q01_05
+count_members(Count) :-
+    countryList(List),
+    length(List, Count).

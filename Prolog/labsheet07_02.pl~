@@ -1,0 +1,21 @@
+%Task 01
+
+list(X,[X|_]).
+list(X,[_|TALL]):- list(X,TALL),!.
+
+%Task 02_01
+tree(5,3,7).
+tree(3,1,4).
+tree(7,6,9).
+
+left(Node,Left):-tree(Node,Left,_).
+right(Node,Right):-tree(Node,_,Right).
+
+%Task 02_02
+bfs([],[]).
+bfs([Node | Queue], [Node | Result]) :-
+    findall(Child, (left(Node, Child); right(Node, Child)), Children),
+    append(Queue, Children, NewQueue),
+    bfs(NewQueue, Result).
+bfs_traversal(Root, Result) :-
+    bfs([Root], Result).
