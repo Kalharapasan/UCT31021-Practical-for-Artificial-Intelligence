@@ -1,0 +1,276 @@
+% Advanced Prolog Program - Intelligent Knowledge Base System
+% This program demonstrates advanced Prolog concepts including:
+% - Constraint Logic Programming
+% - Meta-programming
+% - Complex recursive structures
+% - Dynamic predicates
+% - Cut operations and negation
+
+:- dynamic(fact/2).
+:- dynamic(rule/3).
+:- dynamic(learned/1).
+
+% ========== CONSTRAINT LOGIC PROGRAMMING ==========
+% Sudoku solver using constraint logic programming
+:- use_module(library(clpfd)).
+
+sudoku(Rows) :-
+    length(Rows, 9),
+    maplist(same_length(Rows), Rows),
+    append(Rows, Vs), Vs ins 1..9,
+    maplist(all_different, Rows),
+    transpose(Rows, Columns),
+    maplist(all_different, Columns),
+    Rows = [A,B,C,D,E,F,G,H,I],
+    blocks(A, B, C), blocks(D, E, F), blocks(G, H, I).
+
+blocks([], [], []).
+blocks([A,B,C|Bs1], [D,E,F|Bs2], [G,H,I|Bs3]) :-
+    all_different([A,B,C,D,E,F,G,H,I]),
+    blocks(Bs1, Bs2, Bs3).
+
+% ========== EXPERT SYSTEM FRAMEWORK ==========
+% Dynamic knowledge base with learning capabilities
+
+% Define initial facts
+fact(bird, tweety).
+fact(mammal, felix).
+fact(color(tweety), yellow).
+fact(color(felix), black).
+fact(can_fly, tweety).
+
+% Define inference rules
+rule(mortal(X), animal(X), 'All animals are mortal').
+rule(animal(X), bird(X), 'All birds are animals').
+rule(animal(X), mammal(X), 'All mammals are animals').
+rule(has_feathers(X), bird(X), 'All birds have feathers').
+
+% Meta-interpreter for forward chaining
+forward_chain :-
+    rule(Head, Body, Description),
+    \+ fact(Head, _),
+    call(Body),
+    assertz(fact(Head, true)),
+    format('Learned: ~w (~w)~n', [Head, Description]),
+    assertz(learned(Head)),
+    forward_chain.
+forward_chain.
+
+% Meta-interpreter for backward chaining
+prove(Goal) :-
+    fact(Goal, _), !.
+prove(Goal) :-
+    rule(Goal, Body, _),
+    prove_all(Body).
+
+prove_all((A, B)) :- !,
+    prove(A),
+    prove_all(B).
+prove_all(A) :-
+    prove(A).
+
+% ========== COMPLEX DATA STRUCTURES ==========
+% Binary search tree implementation
+
+% Insert into BST
+bst_insert(nil, Key-Value, node(Key, Value, nil, nil)).
+bst_insert(node(K, V, L, R), Key-Value, node(K, V, NewL, R)) :-
+    Key < K, !,
+    bst_insert(L, Key-Value, NewL).
+bst_insert(node(K, V, L, R), Key-Value, node(K, V, L, NewR)) :-
+    Key > K, !,
+    bst_insert(R, Key-Value, NewR).
+bst_insert(node(K, _, L, R), K-Value, node(K, Value, L, R)).
+
+% Search in BST
+bst_search(node(Key, Value, _, _), Key, Value) :- !.
+bst_search(node(K, _, L, _), Key, Value) :-
+    Key < K, !,
+    bst_search(L, Key, Value).
+bst_search(node(K, _, _, R), Key, Value) :-
+    Key > K,
+    bst_search(R, Key, Value).
+
+% In-order traversal
+bst_inorder(nil, []).
+bst_inorder(node(K, V, L, R), List) :-
+    bst_inorder(L, LeftList),
+    bst_inorder(R, RightList),
+    append(LeftList, [K-V|RightList], List).
+
+% ========== GRAPH ALGORITHMS ==========
+% Graph representation and pathfinding
+
+% Graph edges (directed)
+edge(a, b, 3).
+edge(a, c, 5).
+edge(b, d, 2).
+edge(c, d, 1).
+edge(c, e, 4).
+edge(d, e, 2).
+edge(d, f, 6).
+edge(e, f, 1).
+
+% Dijkstra's shortest path algorithm
+dijkstra(Start, End, Path, Distance) :-
+    dijkstra_helper([(0, Start, [Start])], End, [], Path, Distance).
+
+dijkstra_helper([(D, Node, Path)|_], Node, _, Path, D) :- !.
+dijkstra_helper([(D, Node, Path)|Rest], Target, Visited, FinalPath, FinalDist) :-
+    \+ member(Node, Visited),
+    findall((NewD, Next, [Next|Path]),
+            (edge(Node, Next, Cost),
+             \+ member(Next, Visited),
+             NewD is D + Cost),
+            Extensions),
+    append(Rest, Extensions, NewQueue),
+    sort(NewQueue, SortedQueue),
+    dijkstra_helper(SortedQueue, Target, [Node|Visited], FinalPath, FinalDist).
+dijkstra_helper([_|Rest], Target, Visited, FinalPath, FinalDist) :-
+    dijkstra_helper(Rest, Target, Visited, FinalPath, FinalDist).
+
+% ========== NATURAL LANGUAGE PROCESSING ==========
+% Simple grammar and parser
+
+% DCG Grammar for simple sentences
+sentence --> noun_phrase, verb_phrase.
+noun_phrase --> determiner, noun.
+noun_phrase --> noun.
+verb_phrase --> verb, noun_phrase.
+verb_phrase --> verb.
+
+determiner --> [the].
+determiner --> [a].
+determiner --> [an].
+
+noun --> [cat].
+noun --> [dog].
+noun --> [bird].
+noun --> [mouse].
+
+verb --> [chases].
+verb --> [sees].
+verb --> [catches].
+verb --> [follows].
+
+% Parse and extract meaning
+parse_sentence(Words, Structure) :-
+    sentence(Words, [], Structure).
+
+% ========== MACHINE LEARNING CONCEPTS ==========
+% Simple perceptron implementation
+
+% Perceptron training
+train_perceptron([], Weights, Weights).
+train_perceptron([example(Inputs, Target)|Rest], Weights, FinalWeights) :-
+    perceptron_output(Inputs, Weights, Output),
+    Error is Target - Output,
+    update_weights(Inputs, Weights, Error, 0.1, NewWeights),
+    train_perceptron(Rest, NewWeights, FinalWeights).
+
+perceptron_output(Inputs, Weights, Output) :-
+    dot_product(Inputs, Weights, Sum),
+    (Sum >= 0 -> Output = 1 ; Output = 0).
+
+dot_product([], [], 0).
+dot_product([I|Is], [W|Ws], Sum) :-
+    dot_product(Is, Ws, RestSum),
+    Sum is I * W + RestSum.
+
+update_weights([], [], _, _, []).
+update_weights([I|Is], [W|Ws], Error, LearningRate, [NewW|NewWs]) :-
+    NewW is W + LearningRate * Error * I,
+    update_weights(Is, Ws, Error, LearningRate, NewWs).
+
+% ========== UTILITY PREDICATES ==========
+% Advanced list operations
+
+% Quick sort implementation
+quicksort([], []).
+quicksort([H|T], Sorted) :-
+    partition(H, T, Less, Greater),
+    quicksort(Less, SortedLess),
+    quicksort(Greater, SortedGreater),
+    append(SortedLess, [H|SortedGreater], Sorted).
+
+partition(_, [], [], []).
+partition(Pivot, [H|T], [H|Less], Greater) :-
+    H =< Pivot, !,
+    partition(Pivot, T, Less, Greater).
+partition(Pivot, [H|T], Less, [H|Greater]) :-
+    partition(Pivot, T, Less, Greater).
+
+% Generate permutations
+permutation([], []).
+permutation(List, [H|Perm]) :-
+    select(H, List, Rest),
+    permutation(Rest, Perm).
+
+% N-Queens problem solver
+n_queens(N, Solution) :-
+    length(Solution, N),
+    Solution ins 1..N,
+    all_different(Solution),
+    safe_queens(Solution).
+
+safe_queens([]).
+safe_queens([Q|Qs]) :-
+    safe_queens(Qs),
+    no_attack(Q, Qs, 1).
+
+no_attack(_, [], _).
+no_attack(Q, [Q2|Qs], Dist) :-
+    Q #\= Q2 + Dist,
+    Q #\= Q2 - Dist,
+    Dist1 is Dist + 1,
+    no_attack(Q, Qs, Dist1).
+
+% ========== EXAMPLE QUERIES ==========
+% To test this program, try these queries:
+% 
+% 1. Solve a 4x4 Sudoku:
+%    ?- sudoku([[1,_,_,4],[_,_,_,_],[_,_,_,_],[4,_,_,1]]).
+%
+% 2. Forward chaining inference:
+%    ?- forward_chain.
+%
+% 3. Prove a goal:
+%    ?- prove(mortal(tweety)).
+%
+% 4. Find shortest path:
+%    ?- dijkstra(a, f, Path, Distance).
+%
+% 5. Parse a sentence:
+%    ?- parse_sentence([the, cat, chases, a, mouse], Structure).
+%
+% 6. Solve N-Queens:
+%    ?- n_queens(8, Solution), label(Solution).
+%
+% 7. Sort a list:
+%    ?- quicksort([3,1,4,1,5,9,2,6,5], Sorted).
+
+% ========== ADVANCED QUERY EXAMPLES ==========
+
+% Complex query combining multiple concepts
+analyze_knowledge_base :-
+    format('=== Knowledge Base Analysis ===~n'),
+    findall(F, fact(F, _), Facts),
+    length(Facts, NumFacts),
+    format('Total facts: ~w~n', [NumFacts]),
+    findall(R, rule(R, _, _), Rules),
+    length(Rules, NumRules),
+    format('Total rules: ~w~n', [NumRules]),
+    forward_chain,
+    findall(L, learned(L), Learned),
+    length(Learned, NumLearned),
+    format('Facts learned through inference: ~w~n', [NumLearned]).
+
+% Benchmark different sorting algorithms
+benchmark_sorting :-
+    TestList = [5,2,8,1,9,3,7,4,6],
+    format('Testing quicksort...~n'),
+    time(quicksort(TestList, Sorted1)),
+    format('Result: ~w~n', [Sorted1]),
+    format('Testing built-in sort...~n'),
+    time(sort(TestList, Sorted2)),
+    format('Result: ~w~n', [Sorted2]).
